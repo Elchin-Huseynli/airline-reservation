@@ -1,0 +1,12 @@
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: nihat@div.edu.az
+    password: beos wnox bdby wkdv
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

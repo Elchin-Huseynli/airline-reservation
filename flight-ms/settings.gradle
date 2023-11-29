@@ -1,0 +1,10 @@
+rootProject.name = 'flight-ms'
+
+include 'common-exception'
+
+project(':common-exception').projectDir = new File(settingsDir, '../common-exception')
+
+include 'common-security'
+
+project(':common-security').projectDir = new File(settingsDir, '../common-security')
+

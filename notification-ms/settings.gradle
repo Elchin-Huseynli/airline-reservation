@@ -1,0 +1,9 @@
+rootProject.name = 'notification-ms'
+
+include 'common-notification'
+
+project(':common-notification').projectDir = new File(settingsDir, '../common-notification')
+
+include 'common-file-generator'
+
+project(':common-file-generator').projectDir = new File(settingsDir, '../common-file-generator')

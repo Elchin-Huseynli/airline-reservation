@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: COMMON-NOTIFICATION
+  profiles:
+    include:
+      - email

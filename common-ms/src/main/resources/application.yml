@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: COMMON-MS
+  profiles:
+    include:
+      - eureka
+

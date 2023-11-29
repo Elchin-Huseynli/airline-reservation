@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: FLIGHT-SERVICE
+  profiles:
+    include:
+      - eureka
+

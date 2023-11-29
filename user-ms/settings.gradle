@@ -1,0 +1,15 @@
+rootProject.name = 'user-ms'
+
+include 'common-security'
+project(':common-security').projectDir = new File(settingsDir, '../common-security')
+
+
+include 'common-exception'
+project(':common-exception').projectDir = new File(settingsDir, '../common-exception')
+
+
+include 'common-notification'
+
+project(':common-notification').projectDir = new File(settingsDir, '../common-notification')
+
+

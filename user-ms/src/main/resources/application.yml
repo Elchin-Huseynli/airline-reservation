@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: user-ms
+  profiles:
+    include:
+      - db
+      - security
+      - eureka
+      - kafka

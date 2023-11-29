@@ -1,0 +1,5 @@
+rootProject.name = 'common-file-generator'
+
+include 'common-notification'
+
+project(':common-notification').projectDir = new File(settingsDir, '../common-notification')

@@ -1,0 +1,5 @@
+application:
+  security:
+    secret-key: cQYioym2DEAkWynSJ5YLlA==cQYioym2DEAkWynSJ5YLlA==cQYioym2DEAkWynSJ5YLlA==
+    access-token-expiration: 9000000
+    refresh-token-expiration: 18000000

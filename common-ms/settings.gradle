@@ -1,0 +1,5 @@
+rootProject.name = 'common-ms'
+
+include 'common-exception'
+project(':common-exception').projectDir = new File(settingsDir, '../common-exception')
+
