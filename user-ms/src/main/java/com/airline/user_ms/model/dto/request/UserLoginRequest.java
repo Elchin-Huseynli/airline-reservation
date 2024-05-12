@@ -1,6 +1,5 @@
 package com.airline.user_ms.model.dto.request;
 
-import com.airline.user_ms.model.constants.Constants;
 import lombok.Builder;
 import org.springframework.validation.annotation.Validated;
 
@@ -11,14 +10,10 @@ import javax.validation.constraints.Pattern;
 @Validated
 public class UserLoginRequest {
 
-    @NotBlank(message = Constants.USERNAME_IS_URGENT)
+    @NotBlank(message = "USERNAME_IS_URGENT")
     private String username;
 
-    @NotBlank(message = Constants.PASSWORD_IS_NOT_VALID)
-    @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", // FIXME 8
-            message = Constants.PASSWORD_REGEX
-    )
+    @NotBlank(message = "PASSWORD_IS_NOT_VALID")
     private String password;
 
     public UserLoginRequest(String username, String password) {
@@ -43,5 +38,13 @@ public class UserLoginRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "UserLoginRequest{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

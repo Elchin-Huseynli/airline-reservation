@@ -1,18 +1,18 @@
 package com.airline.flight_ms.service.impl;
 
 import com.airline.common_exception.exception.ApplicationException;
-import com.airline.flight_ms.model.manage.FlightManagerData;
+import com.airline.common_exception.util.MessagesUtil;
+import com.airline.flight_ms.model.dto.response.AirlineResponse;
+import com.airline.flight_ms.model.dto.response.FlightAllDetailResponse;
+import com.airline.flight_ms.model.feign.AirlineFeignClient;
 import com.airline.flight_ms.helper.FlightServiceHelper;
 import com.airline.flight_ms.mapper.FlightMapping;
-import com.airline.flight_ms.model.constants.Constants;
 import com.airline.flight_ms.model.dto.request.FlightRequest;
 import com.airline.flight_ms.model.dto.response.AirplaneResponse;
 import com.airline.flight_ms.model.dto.response.FlightResponse;
 import com.airline.flight_ms.model.entity.Flight;
-import com.airline.flight_ms.model.enums.Exceptions;
 import com.airline.flight_ms.model.feign.AirplaneFeignClient;
 import com.airline.flight_ms.model.feign.UserFeignClient;
-import com.airline.flight_ms.model.manage.FlightManager;
 import com.airline.flight_ms.repository.FlightRepository;
 import com.airline.flight_ms.service.IFlightService;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +33,11 @@ public class FlightService implements IFlightService {
 
     private final UserFeignClient userFeignClient;
     private final AirplaneFeignClient airplaneFeignClient;
+    private final AirlineFeignClient airlineFeignClient;
     private final FlightMapping flightMapping;
     private final FlightRepository flightRepository;
     private final FlightServiceHelper flightServiceHelper;
+    private final MessagesUtil messagesUtil;
 
     @Override
     public String registration(String authToken, Long adminId, FlightRequest flightRequest) {
@@ -46,19 +48,22 @@ public class FlightService implements IFlightService {
 
             AirplaneResponse airplane = airplaneFeignClient.findById(airplaneId);
 
-            flightServiceHelper.checkFlight(flightRequest); //TODO Check the matches, arrival date and departure date, from and to
+            flightServiceHelper.checkFlight(flightRequest);  //TODO Check the matches, arrival date and departure date, from and to
             flightServiceHelper.checkAirplane(airplaneId, flightRequest); //TODO No plane of times for the same airplane
 
             Flight flight = flightMapping.flightRequestDtoToFlight(flightRequest);
             flight.setEnable(true);
+            flight.setAvailableSeats(airplane.getCapacity());
             Flight saveFlight = flightRepository.save(flight);
 
             flightServiceHelper.flightManagerBuild(airplane,saveFlight);
 
+            flight.setAvailableSeats(airplane.getCapacity());
+
             flightRepository.save(flight);
-            return Constants.REGISTER_SUCCESSFULLY;
+            return messagesUtil.getMessage("REGISTER_SUCCESSFULLY");
         }
-        throw new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION);
+        throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
     }
 
 
@@ -67,12 +72,17 @@ public class FlightService implements IFlightService {
 
         List<Flight> flightsTop100 = flightRepository.findTop100ByIsEnableTrueOrderByIdAsc();
 
+        log.error("show list {}", flightsTop100);
+
         List<Flight> flights = flightServiceHelper.suitableFlight(flightsTop100); //TODO  Check out suitable flight
 
+        log.error("show list {}", flights);
         List<CompletableFuture<FlightResponse>> futures = flights.parallelStream()
                 .map(flight -> CompletableFuture
                         .supplyAsync(() -> flightServiceHelper.createFlightResponse(flight)))
                 .toList();
+        log.error("show list {}", futures);
+
 
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()))
@@ -91,15 +101,17 @@ public class FlightService implements IFlightService {
     public String delete(Long flightId) {
         Flight flight = flightServiceHelper.checkFindFlight(flightId);
         LocalDateTime arrivalDate = flight.getArrivalDate();
-        boolean acceptable = arrivalDate.isBefore(now());
+        LocalDateTime departureDate = flight.getDepartureDate();
+        boolean beforeAcceptable = departureDate.isBefore(now());
+        boolean futureAcceptable = arrivalDate.isAfter(now());
 
-        if (acceptable) {
+        if (beforeAcceptable || futureAcceptable) {
             flight.setEnable(false);
             flightRepository.save(flight);
 
-            return Constants.DELETE_SUCCESSFULLY;
+            return messagesUtil.getMessage("DELETE_SUCCESSFULLY");
         }
-        throw new ApplicationException(Exceptions.FLIGHT_DELETE_UNSUCCESSFULLY);
+        throw new ApplicationException("FLIGHT_DELETE_UNSUCCESSFULLY");
     }
 
     @Override
@@ -117,7 +129,7 @@ public class FlightService implements IFlightService {
         Flight updateFlight = flightMapping.flightUpdateRequestToFlight(flight, flightRequest);
         flightRepository.save(updateFlight);
 
-        return Constants.UPDATE_SUCCESSFULLY;
+        return messagesUtil.getMessage("UPDATE_SUCCESSFULLY");
     }
 
     @Override
@@ -127,7 +139,32 @@ public class FlightService implements IFlightService {
         flight.setFly(isFly);
         flightRepository.save(flight);
 
-        return Constants.UPDATE_SUCCESSFULLY;
+        return messagesUtil.getMessage("UPDATE_SUCCESSFULLY");
     }
+
+
+    @Override
+    public String decreaseUpdateAvailableSeats(Long id) {
+        flightRepository.decreaseUpdateAvailableSeats(id);
+
+        return messagesUtil.getMessage("UPDATE_SUCCESSFULLY");
+
+    }
+
+    @Override
+    public List<AirlineResponse> findAllAirline(String country, String airline) {
+
+        return airlineFeignClient.airlines(country, airline);
+    }
+
+    @Override
+    public List<FlightAllDetailResponse> flights() {
+        List<Flight> flights = flightRepository.findAll();
+
+        List<Flight> suitableFlights = flightServiceHelper.suitableFlight(flights);
+
+         return flightMapping.flightToFlightAllDetailResponse(suitableFlights);
+    }
+
 
 }

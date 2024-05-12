@@ -1,0 +1,7 @@
+application:
+  common:
+    update-price: 10000
+    update-fly-detail: 10000
+
+server:
+  port: 9091

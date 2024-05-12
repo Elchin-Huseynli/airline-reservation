@@ -1,17 +1,16 @@
 package com.airline.user_ms.service.impl;
 
 import com.airline.common_exception.exception.ApplicationException;
+import com.airline.common_exception.util.MessagesUtil;
 import com.airline.common_security.model.dto.response.AuthenticationResponse;
 import com.airline.common_security.model.enums.RoleType;
 import com.airline.common_security.service.IJwtService;
 import com.airline.user_ms.helper.UserServiceHelper;
 import com.airline.user_ms.mapper.UserMapper;
-import com.airline.user_ms.model.constants.Constants;
 import com.airline.user_ms.model.dto.request.UserLoginRequest;
 import com.airline.user_ms.model.dto.request.UserRequest;
 import com.airline.user_ms.model.dto.response.JwtResponse;
 import com.airline.user_ms.model.entity.User;
-import com.airline.user_ms.model.enums.Exceptions;
 import com.airline.user_ms.repository.UserRepository;
 import com.airline.user_ms.service.IConfirmationOtpService;
 import com.airline.user_ms.service.IConfirmationTokenService;
@@ -43,6 +42,8 @@ public class UserService implements IUserService {
     private final UserServiceHelper userServiceHelper;
     private final IConfirmationOtpService confirmationOtpService;
     private final IConfirmationTokenService confirmationTokenService;
+    private final MessagesUtil messagesUtil;
+
 
 
     @SneakyThrows
@@ -50,14 +51,15 @@ public class UserService implements IUserService {
     public String registration(UserRequest userRequest) {
         User user = userMapper.userRequestDtoToUser(userRequest);
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new ApplicationException(Exceptions.USER_IS_ALREADY_EXISTS);
+            throw new ApplicationException("USER_IS_ALREADY_EXISTS");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(RoleType.USER);
         userRepository.save(user);
         confirmationTokenService.confirmationToken(user);
 
-        return Constants.USER_REGISTER_SUCCESSFULLY;
+
+        return messagesUtil.getMessage("USER_REGISTER_SUCCESSFULLY");
     }
 
     @Override
@@ -66,7 +68,7 @@ public class UserService implements IUserService {
                 new UsernamePasswordAuthenticationToken(userRequest.getUsername(), userRequest.getPassword()));
 
         User user = userRepository.findByUsernameIgnoreCaseAndIsEnable(userRequest.getUsername(),true)
-                .orElseThrow(() -> new UsernameNotFoundException(Exceptions.USERNAME_NOT_FOUND.getMessage() + " " + userRequest.getUsername()));
+                .orElseThrow(() -> new UsernameNotFoundException("USERNAME_NOT_FOUND" + " " + userRequest.getUsername()));
 
         return userServiceHelper.getAuthenticationResponseGlobalResponse(user);
     }
@@ -82,19 +84,19 @@ public class UserService implements IUserService {
                 return userServiceHelper.getAuthenticationResponseGlobalResponse(user);
             }
 
-        throw new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION);
+        throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
     }
 
 
     @Override
     public String renewPassword(String username) {
         User user = userRepository.findByUsernameIgnoreCaseAndIsEnable(username,true)
-                .orElseThrow(() -> new UsernameNotFoundException(Exceptions.USERNAME_NOT_FOUND + " " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("USERNAME_NOT_FOUND" + " " + username));
 
         Long otpDuration = Duration.ofMinutes(5).toMinutes();
         confirmationOtpService.confirmationOtp(user,otpDuration);
 
-        return Constants.SEND_EMAIL_SUCCESSFULLY;
+        return messagesUtil.getMessage("SEND_EMAIL_SUCCESSFULLY");
     }
 
     @Override
@@ -108,15 +110,15 @@ public class UserService implements IUserService {
             String oldPassword = user.getPassword();
 
             if (passwordEncoder.matches(newPassword, oldPassword)) {
-                throw new ApplicationException(Exceptions.NEW_PASS_AND_OLD_PASS_IS_SAME);
+                throw new ApplicationException("NEW_PASS_AND_OLD_PASS_IS_SAME");
             }
             String encodeNewPassword = passwordEncoder.encode(newPassword);
             user.setPassword(encodeNewPassword);
             user.setEnable(true);
             userRepository.save(user);
-            return Constants.RESET_PASSWORD_SUCCESSFULLY;
+            return messagesUtil.getMessage("RESET_PASSWORD_SUCCESSFULLY");
         }
-        throw new ApplicationException(Exceptions.RESETTING_PASSWORD_IS_INVALID);
+        throw new ApplicationException("RESETTING_PASSWORD_IS_INVALID");
     }
 
     @Override
@@ -126,7 +128,7 @@ public class UserService implements IUserService {
             User admin = userMapper.userRequestDtoToUser(userRequest);
 
             if (userRepository.existsByEmail(admin.getEmail())) {
-                throw new ApplicationException(Exceptions.USER_IS_ALREADY_EXISTS);
+                throw new ApplicationException("USER_IS_ALREADY_EXISTS");
             }
 
             admin.setPassword(passwordEncoder.encode(admin.getPassword()));
@@ -134,9 +136,9 @@ public class UserService implements IUserService {
             userRepository.save(admin);
             Long otpDuration = Duration.ofMinutes(14400).toMinutes();
             confirmationOtpService.confirmationOtp(admin, otpDuration);
-            return Constants.ADMIN_REGISTER_SUCCESSFULLY;
+            return messagesUtil.getMessage("ADMIN_REGISTER_SUCCESSFULLY");
         }
-        throw new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION);
+        throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
 
     }
 
@@ -145,16 +147,16 @@ public class UserService implements IUserService {
         Map<User, String> userAndJwt = userServiceHelper.checkToken(authHeader, adminId);
         User user = userAndJwt.keySet().stream()
                 .findAny()
-                .orElseThrow(()->new ApplicationException(Exceptions.USERNAME_NOT_FOUND));
+                .orElseThrow(()->new ApplicationException("USERNAME_NOT_FOUND"));
 
         String jwt = userAndJwt.values().stream()
                 .findAny()
-                .orElseThrow(() -> new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION));
+                .orElseThrow(() -> new ApplicationException("TOKEN_IS_INVALID_EXCEPTION"));
 
         if (jwtService.isTokenValid(jwt, user)) {
                 return true;
             }
-        throw new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION);
+        throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
     }
 
     @Override

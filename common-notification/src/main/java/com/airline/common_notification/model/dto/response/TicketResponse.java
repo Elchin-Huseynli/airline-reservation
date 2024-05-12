@@ -2,6 +2,7 @@ package com.airline.common_notification.model.dto.response;
 
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -23,14 +24,14 @@ public class TicketResponse {
 
     private LocalDateTime departureDate;
 
-    private Double price;
+    private BigDecimal price;
 
     private Long flightId;
 
     public TicketResponse() {
     }
 
-    public TicketResponse(Long ticketId, String firstName, String lastName, String email, AirlineResponse from, AirlineResponse to, LocalDateTime arrivalDate, LocalDateTime departureDate, Double price, Long flightId) {
+    public TicketResponse(Long ticketId, String firstName, String lastName, String email, AirlineResponse from, AirlineResponse to, LocalDateTime arrivalDate, LocalDateTime departureDate, BigDecimal price, Long flightId) {
         this.ticketId = ticketId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -107,11 +108,12 @@ public class TicketResponse {
         this.arrivalDate = arrivalDate;
     }
 
-    public Double getPrice() {
+
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -131,6 +133,8 @@ public class TicketResponse {
     public void setEmail(String email) {
         this.email = email;
     }
+
+
 
     @Override
     public String toString() {

@@ -3,6 +3,7 @@ package com.airline.common_security.config;
 import com.airline.common_security.service.IJwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 @RequiredArgsConstructor
+@Configuration
 public class CommonJwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final IJwtService jwtService;

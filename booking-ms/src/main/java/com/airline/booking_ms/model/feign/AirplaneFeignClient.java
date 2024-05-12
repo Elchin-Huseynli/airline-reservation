@@ -5,8 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RestController
-@FeignClient(name = "AirplaneFeignClient", url = "http://host.docker.internal:9095/airplane-ms")
+@FeignClient(name = "AirplaneFeignClient", url = "http://localhost:9095/airplane-ms")
 public interface AirplaneFeignClient {
 
     @GetMapping("/airplanes/{id}")
@@ -15,9 +14,7 @@ public interface AirplaneFeignClient {
     @GetMapping("/airplanes/find-all")
     List<AirplaneResponse> findAllByBusyFalse(@RequestParam boolean busy);
 
-    @PostMapping("/airplane/{id}")
-    String updateIsBusy(@PathVariable Long id, @RequestParam Boolean busy);
+    @PostMapping("/airplanes/{id}")
+    String updateIsBusy(@PathVariable Long id, @RequestParam boolean busy);
 
-    @PostMapping("airplanes/decreasing-seats/{airplaneId}")
-    public String decreaseUpdateAvailableSeats(@PathVariable(name = "airplaneId") Long id);
 }

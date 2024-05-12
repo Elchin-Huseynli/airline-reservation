@@ -5,3 +5,5 @@ spring:
     include:
       - db
       - eureka
+      - security
+

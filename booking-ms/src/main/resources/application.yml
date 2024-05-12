@@ -6,3 +6,5 @@ spring:
       - db
       - eureka
       - kafka
+      - security
+      - common

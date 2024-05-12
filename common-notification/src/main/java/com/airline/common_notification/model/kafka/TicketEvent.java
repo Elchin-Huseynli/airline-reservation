@@ -16,34 +16,6 @@ public class TicketEvent {
         this.ticket = ticket;
     }
 
-    public TicketEvent() {
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public TicketResponse getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(TicketResponse ticket) {
-        this.ticket = ticket;
-    }
-
-
     @Override
     public String toString() {
         return "TicketEvent{" +

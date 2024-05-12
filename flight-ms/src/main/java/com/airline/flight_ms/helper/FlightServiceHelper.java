@@ -7,7 +7,6 @@ import com.airline.flight_ms.model.dto.response.AirlineResponse;
 import com.airline.flight_ms.model.dto.response.AirplaneResponse;
 import com.airline.flight_ms.model.dto.response.FlightResponse;
 import com.airline.flight_ms.model.entity.Flight;
-import com.airline.flight_ms.model.enums.Exceptions;
 import com.airline.flight_ms.model.feign.AirlineFeignClient;
 import com.airline.flight_ms.model.feign.AirplaneFeignClient;
 import com.airline.flight_ms.model.manage.FlightManager;
@@ -16,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class FlightServiceHelper {
         AirlineResponse from = airlineFeignClient.airlineById(fromAirlineId);
         AirlineResponse to = airlineFeignClient.airlineById(toAirlineId);
 
-        double price = 0;
+        BigDecimal price = BigDecimal.valueOf(0);
 
         for (FlightManager flightManager:flightManagerData.flightManagers) {
             if (flightManager.getFlightId().equals(flight.getId())){
@@ -57,6 +57,8 @@ public class FlightServiceHelper {
                 .price(price)
                 .arrivalDate(arrivalDate)
                 .departureDate(departureDate)
+                .availableSeats(flight.getAvailableSeats())
+                .isEnable(flight.getEnable())
                 .build();
     }
 
@@ -75,7 +77,7 @@ public class FlightServiceHelper {
                     .toList();
 
             if (!filteredFlights.isEmpty()) {
-                throw new ApplicationException(Exceptions.PLANE_BUSY);
+                throw new ApplicationException("PLANE_BUSY");
             }
         }
     }
@@ -88,36 +90,40 @@ public class FlightServiceHelper {
         AirlineResponse from = airlineFeignClient.airlineById(fromAirlineId);
         AirlineResponse to = airlineFeignClient.airlineById(toAirlineId);
 
-        if (from.equals(to)) throw new ApplicationException(Exceptions.FROM_ID_AND_TO_ID_EQUALS);
+        if (from.equals(to)) throw new ApplicationException("FROM_ID_AND_TO_ID_EQUALS");
 
         boolean isTrue = flightRequest.getArrivalDate()
                 .isBefore(flightRequest.getDepartureDate());
 
-        if (!isTrue) throw new ApplicationException(Exceptions.ILLEGAL_DATE_TIME);
+        if (!isTrue) throw new ApplicationException("ILLEGAL_DATE_TIME");
     }
 
-    public List<Flight>  suitableFlight(List<Flight> flightsTop100) {
+    public List<Flight> suitableFlight(List<Flight> flightsTop100) {
         return flightsTop100.stream()
                 .filter(Flight::getEnable)
                 .filter(flight -> flight.getDepartureDate().isAfter(now()))
-                .filter(flight -> {
-                    AirplaneResponse airplane = airplaneFeignClient.findById(flight.getAirplaneId());
-                    return airplane.getAvailableSeats() > 0;
-                })
+                .filter(flight -> flight.getAvailableSeats() > 0)
                 .toList();
     }
 
     public Flight checkFindFlight (Long flightId) {
-        return flightRepository.findById(flightId)
-                .orElseThrow(() -> new ApplicationException(Exceptions.FLIGHT_NOT_FOUND));
+        return flightRepository.findByIdAndIsEnableTrue(flightId)
+                .orElseThrow(() -> new ApplicationException("FLIGHT_NOT_FOUND"));
     }
 
     public void flightManagerBuild(AirplaneResponse airplane, Flight flight) {
-        int saleTicketCount = airplane.getCapacity() - airplane.getAvailableSeats();
-        FlightManager flightManager = new FlightManager(flight.getInitialPrice(),
-                airplane.getAvailableSeats(),
-                saleTicketCount,airplane.getCapacity());
+        int saleTicketCount = airplane.getCapacity() - flight.getAvailableSeats();
+
+        FlightManager flightManager = FlightManager.builder()
+                .initialPrice(flight.getInitialPrice())
+                .availableSeats(flight.getAvailableSeats())
+                .saleTicketCount(saleTicketCount)
+                .maxSeats(airplane.getCapacity())
+                .ticketPrice(flight.getInitialPrice())
+                .build();
         flightManager.setFlightId(flight.getId());
+        log.error("flight manager {}",flightManager);
+
         flightManagerData.flightManagers.add(flightManager);
     }
 
@@ -130,12 +136,16 @@ public class FlightServiceHelper {
                 airplaneFeignClient.updateIsBusy(flight.getAirplaneId(), true);
                 flight.setFly(true);
                 flight.setEnable(false);
-                flightRepository.save(flight);
             }
             else if (flight.airplaneIsLanded()){
                 airplaneFeignClient.updateIsBusy(flight.getAirplaneId(), false);
-                airplaneFeignClient.increaseUpdateAvailableSeats(flight.getAirplaneId()); // TODO CAPACITY = AVAILABLE_SEATS
             }
+
+            if (flight.getAvailableSeats() == 0) {
+                flight.setEnable(false);
+            }
+            flightRepository.save(flight);
+            
         }
     }
 }

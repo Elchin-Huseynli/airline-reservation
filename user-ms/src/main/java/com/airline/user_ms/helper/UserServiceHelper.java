@@ -7,7 +7,6 @@ import com.airline.common_security.service.IJwtService;
 import com.airline.user_ms.model.dto.response.JwtResponse;
 import com.airline.user_ms.model.entity.Token;
 import com.airline.user_ms.model.entity.User;
-import com.airline.user_ms.model.enums.Exceptions;
 import com.airline.user_ms.repository.TokenRepository;
 import com.airline.user_ms.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -75,12 +74,12 @@ public class UserServiceHelper {
 
     public Map<User,String> checkToken(String authHeader, Long id) {
         if (!securityHelper.authHeaderIsValid(authHeader)) {
-            throw new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION);
+            throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
         }
         String jwt = authHeader.substring(7);
         String username = jwtService.extractUsername(jwt);
 
-        User userBase = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+        User userBase = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("USERNAME_NOT_FOUND"));
 
         boolean equals = userBase.getUsername().equals(username);
         if (username != null && equals) {
@@ -90,7 +89,7 @@ public class UserServiceHelper {
             map.put(user,jwt);
             return map;
         }
-        throw new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION);
+        throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
     }
 
     public JwtResponse checkAuth(String authHeader, Long id){
@@ -98,11 +97,11 @@ public class UserServiceHelper {
 
         User user = userAndJwt.keySet().stream()
                 .findAny()
-                .orElseThrow(()->new ApplicationException(Exceptions.USERNAME_NOT_FOUND));
+                .orElseThrow(()->new ApplicationException("USERNAME_NOT_FOUND"));
 
         String jwt = userAndJwt.values().stream()
                 .findAny()
-                .orElseThrow(() -> new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION));
+                .orElseThrow(() -> new ApplicationException("TOKEN_IS_INVALID_EXCEPTION"));
 
         return JwtResponse.builder()
                 .jwt(jwt)

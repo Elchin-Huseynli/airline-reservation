@@ -83,4 +83,16 @@ public class ConfirmationToken {
     public void setUser(User user) {
         this.user = user;
     }
+
+    @Override
+    public String toString() {
+        return "ConfirmationToken{" +
+                "id=" + id +
+                ", token='" + token + '\'' +
+                ", createdAt=" + createdAt +
+                ", confirmedAt=" + confirmedAt +
+                ", confirm=" + confirm +
+                ", user=" + user +
+                '}';
+    }
 }

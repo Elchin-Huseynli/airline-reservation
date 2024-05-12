@@ -19,7 +19,4 @@ public interface IAirplaneService {
 
     String updateIsBusy(Long id, boolean busy);
 
-    String increaseUpdateAvailableSeats(Long id);
-
-    String decreaseUpdateAvailableSeats(Long id);
 }

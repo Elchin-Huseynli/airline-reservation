@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@FeignClient(name = "AirplaneFeignClient",url = "http://host.docker.internal:9095/airplane-ms/")
+@FeignClient(name = "AirplaneFeignClient",url = "http://localhost:9095/airplane-ms/")
 public interface AirplaneFeignClient {
 
     @GetMapping("/airplanes/{id}")
@@ -16,12 +15,8 @@ public interface AirplaneFeignClient {
     @GetMapping("/airplanes/find-all")
     List<AirplaneResponse> findAllByBusyFalse(@RequestParam(name = "busy") boolean busy);
 
-    @PostMapping("/airplane/{id}")
-    String updateIsBusy(@PathVariable Long id, @RequestParam Boolean busy);
+    @PostMapping("/airplanes/{id}")
+    String updateIsBusy(@PathVariable Long id, @RequestParam boolean busy);
 
-    @PostMapping("airplanes/increasing-seats/{airplaneId}")
-    String increaseUpdateAvailableSeats(@PathVariable(name = "airplaneId") Long id);
 
-    @PostMapping("airplanes/decreasing-seats/{airplaneId}")
-    String decreaseUpdateAvailableSeats(@PathVariable(name = "airplaneId") Long id);
 }

@@ -1,55 +1,55 @@
 package com.airline.user_ms.model.dto.request;
 
-import com.airline.user_ms.model.constants.Constants;
 import lombok.Builder;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
+
 @Builder
 @Validated
 public class UserRequest {
 
-    @NotBlank(message = Constants.FIRST_NAME_IS_URGENT)
+    @NotBlank(message = "FIRST_NAME_IS_URGENT")
     private String firstName;
 
-    @NotBlank(message = Constants.LAST_NAME_IS_URGENT)
+    @NotBlank(message = "LAST_NAME_IS_URGENT")
     private String lastName;
 
-    @NotBlank(message = Constants.USERNAME_IS_URGENT)
+    @NotBlank(message = "USERNAME_IS_URGENT")
     private String username;
 
-    @NotBlank(message = Constants.PASSWORD_IS_NOT_VALID)
+    @NotBlank(message = "PASSWORD_IS_NOT_VALID")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-            message = Constants.PASSWORD_REGEX
+            message = "PASSWORD_REGEX"
     )
     private String password;
 
     @Pattern(
             regexp = "^(\\+[0-9]{1,4}[-.\\s]?)?((\\([0-9]{1,4}\\))|[0-9]{1,4})[-.\\s]?[0-9]{1,14}$",
-            message = Constants.INVALID_PHONE
+            message = "INVALID_PHONE"
     )
     private String phoneNumber;
 
-    @NotBlank(message = Constants.EMAIL_IS_URGENT)
-    @Email(message = Constants.EMAIL_IS_NOT_VALID)
+    @NotBlank(message = "EMAIL_IS_URGENT")
+    @Email(message = "EMAIL_IS_NOT_VALID")
     private String email;
 
-    @Past
+    @Past(message = "INVALID_BIRTHDATE")
     private LocalDate birthdate;
 
     @Pattern(
             regexp = "^[0-9a-zA-Z]{7}$",
-            message = Constants.INVALID_FIN
+            message = "INVALID_FIN"
     )
 
     private String fin;
 
     @Pattern(
             regexp = "^(?:AA\\d{7}|AZE\\d{8})$",
-            message = Constants.INVALID_SERIAL_NUMBER
+            message = "INVALID_SERIAL_NUMBER"
     )
     private String serialNumber;
 

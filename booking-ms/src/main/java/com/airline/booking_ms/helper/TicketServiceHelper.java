@@ -1,11 +1,14 @@
 package com.airline.booking_ms.helper;
 
+import com.airline.booking_ms.mapper.TicketMapper;
 import com.airline.booking_ms.model.dto.request.UserRequest;
 import com.airline.booking_ms.model.dto.response.FlightResponse;
 import com.airline.booking_ms.model.entity.Ticket;
+import com.airline.booking_ms.model.feign.AirlineFeignClient;
 import com.airline.booking_ms.model.feign.AirplaneFeignClient;
 import com.airline.booking_ms.model.feign.FlightFeignClient;
 import com.airline.common_notification.model.dto.response.AirlineResponse;
+import com.airline.common_notification.model.dto.response.TicketResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +17,8 @@ import org.springframework.stereotype.Service;
 public class TicketServiceHelper {
 
     private final FlightFeignClient flightFeignClient;
-    private final AirplaneFeignClient airplaneFeignClient;
+    private final AirlineFeignClient airlineFeignClient;
+    private final TicketMapper ticketMapper;
 
 
     public Ticket createTicketBuild(Long flightId, UserRequest userRequest, Long userId) {
@@ -22,7 +26,7 @@ public class TicketServiceHelper {
         FlightResponse flight = flightFeignClient.flight(flightId);
         AirlineResponse from = flight.getFrom();
         AirlineResponse to = flight.getTo();
-        airplaneFeignClient.decreaseUpdateAvailableSeats(flight.getAirplaneId());
+        flightFeignClient.decreaseUpdateAvailableSeats(flightId);
 
         return Ticket.builder()
                 .firstName(userRequest.getFirstName())
@@ -39,5 +43,19 @@ public class TicketServiceHelper {
                 .flightId(flightId)
                 .userId(userId)
                 .build();
+    }
+
+    public TicketResponse createTicketResponseWithAirlineInfo(Ticket ticket) {
+        AirlineResponse from = airlineFeignClient.airlineById(ticket.getFromAirlineId());
+        AirlineResponse to = airlineFeignClient.airlineById(ticket.getToAirlineId());
+
+        TicketResponse ticketResponse = ticketMapper.ticketToTicketResponse(ticket);
+
+        if (ticket.getFromAirlineId().equals(from.getId()) && ticket.getToAirlineId().equals(to.getId())) {
+            ticketResponse.setFrom(from);
+            ticketResponse.setTo(to);
+        }
+
+        return ticketResponse;
     }
 }

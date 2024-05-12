@@ -1,6 +1,5 @@
 package com.airline.booking_ms.model.dto.request;
 
-import com.airline.booking_ms.model.constants.Constants;
 import lombok.Builder;
 import org.springframework.validation.annotation.Validated;
 
@@ -14,13 +13,13 @@ import java.time.LocalDate;
 @Validated
 public class UserRequest {
 
-    @NotNull(message = Constants.FIRSTNAME_URGENT)
+    @NotNull(message = "FIRSTNAME_URGENT")
     private String firstName;
 
-    @NotNull(message = Constants.LASTNAME_URGENT)
+    @NotNull(message = "LASTNAME_URGENT")
     private String lastName;
 
-    @NotNull(message = Constants.EMAIL_URGENT)
+    @NotNull(message = "EMAIL_URGENT")
     @Email
     private String email;
 
@@ -29,14 +28,14 @@ public class UserRequest {
 
     @Pattern(
             regexp = "^[0-9a-zA-Z]{7}$",
-            message = Constants.INVALID_FIN
+            message = "INVALID_FIN"
     )
 
     private String fin;
 
     @Pattern(
             regexp = "^(?:AA\\d{7}|AZE\\d{7})$",
-            message = Constants.INVALID_SERIAL_NUMBER
+            message = "INVALID_SERIAL_NUMBER"
     )
     private String serialNumber;
 
@@ -44,14 +43,14 @@ public class UserRequest {
     public UserRequest() {
     }
 
-    public UserRequest(String firstName, String lastName, LocalDate birthdate, String fin, String serialNumber) {
+    public UserRequest(String firstName, String lastName, String email, LocalDate birthdate, String fin, String serialNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
         this.birthdate = birthdate;
         this.fin = fin;
         this.serialNumber = serialNumber;
     }
-
 
     public String getFirstName() {
         return firstName;

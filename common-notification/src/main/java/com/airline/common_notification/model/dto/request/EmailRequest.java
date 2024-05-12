@@ -15,7 +15,6 @@ import javax.validation.constraints.Size;
 @Builder
 @Validated
 public class EmailRequest {
-
     @NotBlank(message = Constants.EMAIL_IS_URGENT)
     @Email(message = Constants.EMAIL_IS_NOT_VALID)
     private String to;

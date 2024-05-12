@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class EmailServiceHelper {
 
     public EmailRequest confirmationTokenSendEmail(User user, ConfirmationToken confirmationToken){
-        String url = "http://localhost:8080/user-ms/user/confirmation?token=" +
+        String url = "http://localhost:9093/user-ms/user/confirmation?token=" +
                 confirmationToken.getToken();
         return EmailRequest.builder()
                 .to(user.getEmail())
@@ -27,7 +27,7 @@ public class EmailServiceHelper {
     }
 
     public EmailRequest confirmationOtpSendEmail(User user, ConfirmationOtp confirmationOtp) {
-        String url = "http://localhost:8080/user-ms/user/resets-password?username=" +
+        String url = "http://localhost:9093/user-ms/user/resets-password?username=" +
                 user.getUsername() +
                 "&otp=" +
                 confirmationOtp.getOtp();

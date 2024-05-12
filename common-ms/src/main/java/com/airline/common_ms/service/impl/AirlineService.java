@@ -2,7 +2,6 @@ package com.airline.common_ms.service.impl;
 
 import com.airline.common_exception.exception.ApplicationException;
 import com.airline.common_ms.model.dao.Airline;
-import com.airline.common_ms.model.enums.Exceptions;
 import com.airline.common_ms.service.IAirlineService;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -28,7 +27,7 @@ public class AirlineService implements IAirlineService {
         return Airline.values.stream()
                 .filter(airline -> Objects.equals(id, airline.getId()))
                 .findFirst()
-                .orElseThrow(() -> new ApplicationException(Exceptions.AIRPORT_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException("AIRLINE_NOT_FOUND"));
 
     }
 }

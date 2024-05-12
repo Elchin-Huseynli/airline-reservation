@@ -5,22 +5,21 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.*;
 
-import static com.airline.airplane_ms.model.constant.Constants.*;
 
 @Builder
 @Validated
 public class AirplaneRequest {
 
-    @NotBlank(message = AIRPLANE_NAME_URGENT)
+    @NotBlank(message = "AIRPLANE_NAME_URGENT")
     private String name;
-    @Max(value = 900, message = MAX_SPEED_BE_GREATER)
-    @Min(value = 300, message = MAX_SPEED_CANNOT_BE_LESS)
+    @Max(value = 900, message = "MAX_SPEED_BE_GREATER")
+    @Min(value = 300, message = "MIN_SPEED_CANNOT_BE_LESS")
     private Float maxSpeed;
 
-    @NotNull(message = CAPACITY_CANNOT_BE_NULL)
-    @Positive(message = CAPACITY_POSITIVE_VALUE)
-    @Max(value = 500, message = CAPACITY_BE_GREATER)
-    @Min(value = 1, message = CAPACITY_CANNOT_BE_LESS)
+    @NotNull(message = "CAPACITY_CANNOT_BE_NULL")
+    @Positive(message = "CAPACITY_POSITIVE_VALUE")
+    @Max(value = 500, message = "CAPACITY_BE_GREATER")
+    @Min(value = 1, message = "CAPACITY_CANNOT_BE_LESS")
     private Integer capacity;
 
 

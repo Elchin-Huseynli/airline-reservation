@@ -1,25 +1,30 @@
 package com.airline.booking_ms.service.impl;
 
 import com.airline.booking_ms.helper.TicketServiceHelper;
-import com.airline.booking_ms.mapper.TicketMapper;
-import com.airline.booking_ms.model.constants.Constants;
 import com.airline.booking_ms.model.dto.request.UserRequest;
 import com.airline.booking_ms.model.entity.Ticket;
-import com.airline.booking_ms.model.enums.Exceptions;
-import com.airline.booking_ms.model.feign.AirlineFeignClient;
 import com.airline.booking_ms.model.feign.UserFeignClient;
-import com.airline.common_notification.model.dto.response.AirlineResponse;
-import com.airline.common_notification.model.dto.response.TicketResponse;
-import com.airline.common_notification.model.kafka.TicketEvent;
 import com.airline.booking_ms.repository.TicketRepository;
 import com.airline.booking_ms.service.ITicketService;
 import com.airline.common_exception.exception.ApplicationException;
+import com.airline.common_exception.util.MessagesUtil;
+import com.airline.common_notification.model.dto.response.TicketResponse;
+
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.airline.common_file_generator.service.PdfGenerator.generatePdfContent;
 
 @Service
 @RequiredArgsConstructor
@@ -28,37 +33,52 @@ public class TicketService implements ITicketService {
     private final UserFeignClient userFeignClient;
     private final TicketServiceHelper ticketServiceHelper;
     private final TicketRepository ticketRepository;
-    private final TicketMapper ticketMapper;
-    private final AirlineFeignClient airlineFeignClient;
     private final TicketProducer ticketProducer;
+    private final MessagesUtil messagesUtil;
 
     @Override
     public String bookTicket(String authToken, Long userId, Long flightId, UserRequest userRequest) {
         boolean tokenValid = userFeignClient.jwtAuthCheckUser(authToken, userId);
 
-        if (tokenValid){
-            Ticket ticket = ticketServiceHelper.createTicketBuild(flightId, userRequest,userId);
+        if (tokenValid) {
+            Ticket ticket = ticketServiceHelper.createTicketBuild(flightId, userRequest, userId);
             ticketRepository.save(ticket);
 
-            TicketResponse ticketResponse = createTicketResponseWithAirlineInfo(ticket);
-            TicketEvent ticketEvent = new TicketEvent();
-            ticketEvent.setStatus("PENDING");
-            ticketEvent.setMessage("ticket status is in pending state");
-            ticketEvent.setTicket(ticketResponse);
-            ticketProducer.sendMessage(ticketEvent);
+            TicketResponse ticketResponse = ticketServiceHelper.createTicketResponseWithAirlineInfo(ticket);
+            ticketProducer.sendMessage(ticketResponse);
 
-            return Constants.TICKET_BOUGHT_SUCCESSFULLY;
-
+            return messagesUtil.getMessage("TICKET_BOUGHT_SUCCESSFULLY");
         }
 
-        throw new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION);
+        throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
     }
 
     @Override
-    public void makePdf() {
+    @SneakyThrows
+    public ResponseEntity<Resource> makePdf(String authToken, Long userId, Long ticketId) {
+        boolean tokenValid = userFeignClient.jwtAuthCheckUser(authToken, userId);
 
+        if (tokenValid) {
+            Ticket ticket = ticketRepository.findByIdAndUserIdCheck(ticketId, userId)
+                    .orElseThrow(() -> new ApplicationException("TICKET_NOT_FOUND"));
+
+            TicketResponse formattingTicket = ticketServiceHelper.createTicketResponseWithAirlineInfo(ticket);
+
+            byte[] pdfBytes = generatePdfContent(formattingTicket);
+
+            String fileName = "ticket_" + formattingTicket.getFirstName() + ".pdf";
+
+            ByteArrayResource resource = new ByteArrayResource(pdfBytes);
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                    .body(resource);
+
+        }
+        throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
     }
-
 
     @Override
     public TicketResponse findById(String authToken, Long userId, Long ticketId) {
@@ -67,38 +87,24 @@ public class TicketService implements ITicketService {
 
         if (tokenValid){
             Ticket ticket = ticketRepository.findByIdAndUserIdCheck(ticketId, userId)
-                    .orElseThrow(() -> new ApplicationException(Exceptions.TICKET_NOT_FOUND));
+                    .orElseThrow(() -> new ApplicationException("TICKET_NOT_FOUND"));
 
-            return createTicketResponseWithAirlineInfo(ticket);
+            return ticketServiceHelper.createTicketResponseWithAirlineInfo(ticket);
 
         }
 
-        throw new ApplicationException(Exceptions.TOKEN_IS_INVALID_EXCEPTION);
-
+        throw new ApplicationException("TOKEN_IS_INVALID_EXCEPTION");
     }
 
+    @Override
     public List<TicketResponse> findAllTicketByUserId(String authToken, Long userId) {
         if (!userFeignClient.jwtAuthCheckUser(authToken, userId)) {
             return Collections.emptyList();
         }
 
         return ticketRepository.findAllByUserIdCheck(userId).parallelStream()
-                .map(this::createTicketResponseWithAirlineInfo)
+                .map(ticketServiceHelper::createTicketResponseWithAirlineInfo)
                 .filter(ticketResponse -> ticketResponse.getFrom() != null && ticketResponse.getTo() != null)
                 .collect(Collectors.toList());
-    }
-
-    private TicketResponse createTicketResponseWithAirlineInfo(Ticket ticket) {
-        AirlineResponse from = airlineFeignClient.airlineById(ticket.getFromAirlineId());
-        AirlineResponse to = airlineFeignClient.airlineById(ticket.getToAirlineId());
-
-        TicketResponse ticketResponse = ticketMapper.ticketToTicketResponse(ticket);
-
-        if (ticket.getFromAirlineId().equals(from.getId()) && ticket.getToAirlineId().equals(to.getId())) {
-            ticketResponse.setFrom(from);
-            ticketResponse.setTo(to);
-        }
-
-        return ticketResponse;
     }
 }

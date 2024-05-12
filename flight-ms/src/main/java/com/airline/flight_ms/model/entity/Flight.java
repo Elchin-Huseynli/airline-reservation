@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static java.time.LocalDateTime.now;
@@ -21,7 +22,10 @@ public class Flight {
     private Long airplaneId;
     private LocalDateTime arrivalDate;
     private LocalDateTime departureDate;
-    private Double initialPrice;
+    private BigDecimal initialPrice;
+    @Column(name = "available_seats",nullable = false)
+    private Integer availableSeats;
+
 
     @Builder.Default
     private boolean fly = false;
@@ -30,17 +34,17 @@ public class Flight {
     private Boolean isEnable = true;
 
 
-    public Flight(Long id, Long fromAirlineId, Long toAirlineId, Long airplaneId, LocalDateTime departureDate, LocalDateTime arrivalDate, Double initialPrice, boolean isFly, Boolean isEnable) {
+    public Flight(Long id, Long fromAirlineId, Long toAirlineId, Long airplaneId, LocalDateTime arrivalDate, LocalDateTime departureDate, BigDecimal initialPrice, Integer availableSeats, boolean fly, Boolean isEnable) {
         this.id = id;
         this.fromAirlineId = fromAirlineId;
         this.toAirlineId = toAirlineId;
         this.airplaneId = airplaneId;
-        this.departureDate = departureDate;
         this.arrivalDate = arrivalDate;
+        this.departureDate = departureDate;
         this.initialPrice = initialPrice;
-        this.fly = isFly;
+        this.availableSeats = availableSeats;
+        this.fly = fly;
         this.isEnable = isEnable;
-
     }
 
     public Flight() {
@@ -94,11 +98,11 @@ public class Flight {
         this.arrivalDate = arrivalDate;
     }
 
-    public Double getInitialPrice() {
+    public BigDecimal getInitialPrice() {
         return initialPrice;
     }
 
-    public void setInitialPrice(Double initialPrice) {
+    public void setInitialPrice(BigDecimal initialPrice) {
         this.initialPrice = initialPrice;
     }
 
@@ -125,5 +129,13 @@ public class Flight {
 
     public boolean airplaneIsLanded() {
         return departureDate.isBefore(now());
+    }
+
+    public Integer getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(Integer availableSeats) {
+        this.availableSeats = availableSeats;
     }
 }

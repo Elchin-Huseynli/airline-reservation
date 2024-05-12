@@ -153,11 +153,11 @@ public class User implements UserDetails {
         this.tokens = tokens;
     }
 
-    public String getFistName() {
+    public String getFirstName() {
         return firstName;
     }
 
-    public void setFistName(String fistName) {
+    public void setFirstName(String fistName) {
         this.firstName = fistName;
     }
 
@@ -172,7 +172,7 @@ public class User implements UserDetails {
     // user details
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override

@@ -26,14 +26,6 @@ public interface AirplaneRepository extends JpaRepository<Airplane,Long> {
     void updateBusyById(@Param("busy") boolean busy,@Param("id") Long id);
 
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE Airplane SET availableSeats = capacity WHERE id = :id")
-    void increaseUpdateAvailableSeats(@Param("id") Long id);
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE Airplane SET availableSeats = (availableSeats-1) WHERE id = :id and availableSeats > 0")
-    void decreaseUpdateAvailableSeats(@Param("id") Long id);
 
 }

@@ -1,36 +1,46 @@
 package com.airline.flight_ms.model.dto.request;
 
-import com.airline.flight_ms.model.constants.Constants;
 import lombok.Builder;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Future;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
 public class FlightRequest {
 
-    @NotNull(message = Constants.FROM_AIRLINE_ID_URGENT)
+    @NotNull(message = "FROM_AIRLINE_ID_URGENT")
     private Long fromAirlineId;
 
-    @NotNull(message = Constants.TO_AIRLINE_ID_URGENT)
+    @NotNull(message = "TO_AIRLINE_ID_URGENT")
     private Long toAirlineId;
 
-    @NotNull(message = Constants.AIRPLANE_ID_URGENT)
+    @NotNull(message = "AIRPLANE_ID_URGENT")
     private Long airplaneId;
 
-    @NotNull(message = Constants.ARRIVAL_DATE_URGENT)
-    @Future(message = Constants.ARRIVAL_DATE_FUTURE)
+    @NotNull(message = "ARRIVAL_DATE_URGENT")
+    @Future(message = "ARRIVAL_DATE_FUTURE")
     private LocalDateTime arrivalDate;
 
-    @NotNull(message = Constants.DEPARTURE_DATE_URGENT)
-    @Future(message = Constants.DEPARTURE_DATE_FUTURE)
+    @NotNull(message = "DEPARTURE_DATE_URGENT")
+    @Future(message = "DEPARTURE_DATE_FUTURE")
     private LocalDateTime departureDate;
 
-    @NotNull(message = Constants.INITIAL_PRICE_URGENT)
-    @Positive(message = Constants.INITIAL_PRICE_IS_POSITIVE)
-    private Double initialPrice;
+    @NotNull(message = "INITIAL_PRICE_URGENT")
+    @Positive(message = "INITIAL_PRICE_IS_POSITIVE")
+    private BigDecimal initialPrice;
 
+    public FlightRequest(Long fromAirlineId, Long toAirlineId, Long airplaneId, LocalDateTime departureDate, LocalDateTime arrivalDate, BigDecimal initialPrice) {
+        this.fromAirlineId = fromAirlineId;
+        this.toAirlineId = toAirlineId;
+        this.airplaneId = airplaneId;
+        this.departureDate = departureDate;
+        this.arrivalDate = arrivalDate;
+        this.initialPrice = initialPrice;
+    }
+    public FlightRequest() {
+    }
 
     public Long getFromAirlineId() {
         return fromAirlineId;
@@ -72,23 +82,11 @@ public class FlightRequest {
         this.arrivalDate = arrivalDate;
     }
 
-    public Double getInitialPrice() {
+    public BigDecimal getInitialPrice() {
         return initialPrice;
     }
 
-    public void setInitialPrice(Double initialPrice) {
-        this.initialPrice = initialPrice;
-    }
-
-    public FlightRequest() {
-    }
-
-    public FlightRequest(Long fromAirlineId, Long toAirlineId, Long airplaneId, LocalDateTime departureDate, LocalDateTime arrivalDate, Double initialPrice) {
-        this.fromAirlineId = fromAirlineId;
-        this.toAirlineId = toAirlineId;
-        this.airplaneId = airplaneId;
-        this.departureDate = departureDate;
-        this.arrivalDate = arrivalDate;
+    public void setInitialPrice(BigDecimal initialPrice) {
         this.initialPrice = initialPrice;
     }
 

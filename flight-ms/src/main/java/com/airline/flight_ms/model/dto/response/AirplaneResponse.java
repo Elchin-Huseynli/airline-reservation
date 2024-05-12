@@ -8,15 +8,13 @@ public class AirplaneResponse {
     private String name;
     private Float maxSpeed;
     private Integer capacity;
-    private Integer availableSeats;
 
 
-    public AirplaneResponse(Long id, String name, Float maxSpeed, Integer capacity, Integer availableSeats) {
+    public AirplaneResponse(Long id, String name, Float maxSpeed, Integer capacity) {
         this.id = id;
         this.name = name;
         this.maxSpeed = maxSpeed;
         this.capacity = capacity;
-        this.availableSeats = availableSeats;
     }
 
     public AirplaneResponse() {
@@ -54,12 +52,5 @@ public class AirplaneResponse {
         this.capacity = capacity;
     }
 
-    public Integer getAvailableSeats() {
-        return availableSeats;
-    }
-
-    public void setAvailableSeats(Integer availableSeats) {
-        this.availableSeats = availableSeats;
-    }
 
 }

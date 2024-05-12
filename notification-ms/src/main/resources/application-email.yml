@@ -2,8 +2,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: elchin@div.edu.az
-    password: plsn tekw ebor tfar
+    username: nihat@div.edu.az
+    password: #
     properties:
       mail:
         smtp:

@@ -6,7 +6,6 @@ import com.airline.user_ms.helper.ConfirmationServiceHelper;
 import com.airline.user_ms.helper.EmailServiceHelper;
 import com.airline.user_ms.model.entity.ConfirmationOtp;
 import com.airline.user_ms.model.entity.User;
-import com.airline.user_ms.model.enums.Exceptions;
 import com.airline.user_ms.repository.ConfirmationOtpRepository;
 import com.airline.user_ms.repository.UserRepository;
 import com.airline.user_ms.service.IConfirmationOtpService;
@@ -37,14 +36,14 @@ public class ConfirmationOtpService implements IConfirmationOtpService {
 
     public User checkedUsernameAndOtp(String username, String otp) {
         ConfirmationOtp confirmationOtp = confirmationOtpRepository.findByOtp(otp)
-                .orElseThrow(() -> new ApplicationException(Exceptions.OTP_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException("OTP_NOT_FOUND"));
 
         if (!confirmationOtp.getUser().getUsername().equals(username)) {
-            throw new ApplicationException(Exceptions.USER_NOT_FOUND);
+            throw new ApplicationException("USER_NOT_FOUND");
         }
 
         if (confirmationOtp.getExpired().isBefore(LocalDateTime.now())) {
-            throw new ApplicationException(Exceptions.OTP_EXPIRED);
+            throw new ApplicationException("OTP_EXPIRED");
         }
 
         RoleType role = confirmationOtp.getUser().getRole();
@@ -53,11 +52,11 @@ public class ConfirmationOtpService implements IConfirmationOtpService {
 
             return userRepository.findByUsernameIgnoreCaseAndIsEnable(username, true)
                     .orElseThrow(() -> new UsernameNotFoundException(
-                            Exceptions.USERNAME_NOT_FOUND + " " + username));
+                            "USERNAME_NOT_FOUND"));
         }else {
             return userRepository.findByUsernameIgnoreCaseAndIsEnable(username, false)
                     .orElseThrow(() -> new UsernameNotFoundException(
-                            Exceptions.USERNAME_NOT_FOUND + " " + username));
+                            "Not found" + " " + username));
         }
     }
 }

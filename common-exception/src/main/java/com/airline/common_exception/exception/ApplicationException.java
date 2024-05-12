@@ -1,18 +1,19 @@
 package com.airline.common_exception.exception;
 
 
-import com.airline.common_exception.model.enums.CommonException;
-
 public class ApplicationException extends RuntimeException {
-    private final CommonException exceptions;
-    public ApplicationException(CommonException exceptions) {
-        super(exceptions.toString());
+    private final String exceptions;
+    public ApplicationException(String exceptions) {
+        super(exceptions);
         this.exceptions = exceptions;
     }
 
-    public CommonException getExceptions() {
+    public String getMessage() {
+
         return exceptions;
     }
+
+
 
 }
 

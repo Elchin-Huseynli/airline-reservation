@@ -4,10 +4,7 @@ import com.airline.airplane_ms.model.dto.request.AirplaneRequest;
 import com.airline.airplane_ms.model.dto.request.AirplaneUpdateRequest;
 import com.airline.airplane_ms.model.dto.response.AirplaneResponse;
 import com.airline.airplane_ms.model.entity.Airplane;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -27,4 +24,8 @@ public interface AirplaneMapping {
     @Mappings({@Mapping(target = "busy", ignore = true),
             @Mapping(target = "status", ignore = true)})
     Airplane airplaneResponseToAirplane(AirplaneResponse airplaneResponse);
+
+    @Mappings({@Mapping(target = "busy", ignore = true),
+            @Mapping(target = "status", ignore = true)})
+    Airplane airplaneUpdateRequestToUpdateAirplane(@MappingTarget Airplane airplane, AirplaneUpdateRequest airplaneRequest);
 }

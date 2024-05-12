@@ -29,15 +29,16 @@ dependencies {
     implementation project(":common-exception")
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
 
     // Eureka Discovery
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
-
-    // Spring DevTools
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//
+//    // Spring DevTools
+//    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 tasks.named('bootBuildImage') {

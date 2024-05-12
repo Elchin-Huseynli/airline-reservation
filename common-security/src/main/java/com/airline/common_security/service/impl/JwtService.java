@@ -7,14 +7,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService implements IJwtService {
@@ -30,8 +30,9 @@ public class JwtService implements IJwtService {
 
     @Override
     public Claims extractAllClaims(String jwt) {
-        return Jwts.parser()
+        return Jwts.parserBuilder()
                 .setSigningKey(getSiginKey())
+                .build()
                 .parseClaimsJws(jwt)
                 .getBody();
 
@@ -39,38 +40,55 @@ public class JwtService implements IJwtService {
 
     @Override
     public <T> T extractClaim(String jwt, Function<Claims, T> claimsResolved) {
+
         return claimsResolved.apply(extractAllClaims(jwt));
     }
 
 
+
     @Override
     public String extractUsername(String jwt) {
+
         return extractClaim(jwt, Claims::getSubject);
     }
 
     @Override
     public Date extractExpiration(String jwt) {
+
         return extractClaim(jwt, Claims::getExpiration);
     }
 
     @Override
     public Key getSiginKey() {
+
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
     @Override
     public String generateToken(UserDetails userDetails) {
-        return generateToken(userDetails, new HashMap<>());
+        List<String> userRoles = extractRoles(userDetails);
+
+        Map<String, Object> extractClaims = new HashMap<>();
+        extractClaims.put("roles", userRoles);
+
+        return generateToken(userDetails, extractClaims);
     }
+
 
     @Override
     public String generateToken(UserDetails userDetails, Map<String, Object> extractClaims) {
+
         return buildToken(userDetails, extractClaims, accessTokenExpiration);
     }
 
     @Override
     public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(userDetails, new HashMap<>(), refreshTokenExpiration);
+        List<String> userRoles = extractRoles(userDetails);
+
+        Map<String, Object> extractClaims = new HashMap<>();
+        extractClaims.put("roles", userRoles);
+
+        return buildToken(userDetails, extractClaims, refreshTokenExpiration);
     }
 
     @Override
@@ -92,6 +110,22 @@ public class JwtService implements IJwtService {
 
     private boolean isTokenExpired(String jwt) {
         return extractExpiration(jwt).before(new Date());
+    }
+
+    @Override
+    public List<String> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        List<String> roles = (List<String>) claims.get("roles");
+
+        return roles != null ? roles : Collections.emptyList();
+    }
+
+
+    private static List<String> extractRoles(UserDetails userDetails) {
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        return authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
     }
 
 }

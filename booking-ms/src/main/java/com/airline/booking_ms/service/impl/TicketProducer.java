@@ -1,5 +1,6 @@
 package com.airline.booking_ms.service.impl;
 
+import com.airline.common_notification.model.dto.response.TicketResponse;
 import com.airline.common_notification.model.kafka.TicketEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +21,10 @@ public class TicketProducer {
     private final KafkaTemplate<String, TicketEvent> kafkaTemplate;
 
 
-    public void sendMessage(TicketEvent event){
+    public void sendMessage(TicketResponse event){
         log.info("Ticket event => {}", event.toString());
 
-        Message<TicketEvent> message = MessageBuilder
+        Message<TicketResponse> message = MessageBuilder
                 .withPayload(event)
                 .setHeader(KafkaHeaders.TOPIC, topic.name())
                 .build();

@@ -2,6 +2,8 @@ package com.airline.booking_ms.model.dto.response;
 
 import com.airline.common_notification.model.dto.response.AirlineResponse;
 import lombok.Builder;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Builder
 public class FlightResponse {
@@ -15,16 +17,22 @@ public class FlightResponse {
 
     private LocalDateTime arrivalDate;
 
-    private Double price;
+    private BigDecimal price;
+
+    private Integer availableSeats;
+
+    private boolean isEnable;
 
 
-    public FlightResponse(AirlineResponse from, AirlineResponse to, Long airplaneId, LocalDateTime departureDate, LocalDateTime arrivalDate, Double price) {
+    public FlightResponse(AirlineResponse from, AirlineResponse to, Long airplaneId, LocalDateTime departureDate, LocalDateTime arrivalDate, BigDecimal price, Integer availableSeats, boolean isEnable) {
         this.from = from;
         this.to = to;
         this.airplaneId = airplaneId;
         this.departureDate = departureDate;
         this.arrivalDate = arrivalDate;
         this.price = price;
+        this.availableSeats = availableSeats;
+        this.isEnable = isEnable;
     }
 
     public FlightResponse() {
@@ -69,12 +77,27 @@ public class FlightResponse {
         this.arrivalDate = arrivalDate;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
+    public Integer getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(Integer availableSeats) {
+        this.availableSeats = availableSeats;
+    }
+
+    public boolean isEnable() {
+        return isEnable;
+    }
+
+    public void setEnable(boolean enable) {
+        isEnable = enable;
+    }
 }

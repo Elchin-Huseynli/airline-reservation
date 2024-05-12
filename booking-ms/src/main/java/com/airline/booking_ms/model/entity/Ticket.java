@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -38,7 +39,7 @@ public class Ticket {
 
     private LocalDateTime departureDate;
 
-    private Double price;
+    private BigDecimal price;
 
     private Long flightId;
 
@@ -47,10 +48,11 @@ public class Ticket {
     //FIXME pay attention status owing to departure date
 
 
-    public Ticket(Long ticketId, String firstName, String lastName, LocalDate birthday, String fin, String serialNumber, Long toAirlineId, Long fromAirlineId, LocalDateTime arrivalDate, LocalDateTime departureDate, Double price, Long flightId, Long userId) {
+    public Ticket(Long ticketId, String firstName, String lastName, String email, LocalDate birthday, String fin, String serialNumber, Long toAirlineId, Long fromAirlineId, LocalDateTime arrivalDate, LocalDateTime departureDate, BigDecimal price, Long flightId, Long userId) {
         this.ticketId = ticketId;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
         this.birthday = birthday;
         this.fin = fin;
         this.serialNumber = serialNumber;
@@ -138,11 +140,11 @@ public class Ticket {
         this.departureDate = departureDate;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -176,5 +178,25 @@ public class Ticket {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "ticketId=" + ticketId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", birthday=" + birthday +
+                ", fin='" + fin + '\'' +
+                ", serialNumber='" + serialNumber + '\'' +
+                ", toAirlineId=" + toAirlineId +
+                ", fromAirlineId=" + fromAirlineId +
+                ", arrivalDate=" + arrivalDate +
+                ", departureDate=" + departureDate +
+                ", price=" + price +
+                ", flightId=" + flightId +
+                ", userId=" + userId +
+                '}';
     }
 }

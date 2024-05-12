@@ -14,6 +14,7 @@ public class Airline {
     public static Airline SABIHA_GOKCEN = new Airline(4L, "Turkey", "Sabiha Gokcen Airport");
     public static Airline ISTANBUL = new Airline(5L, "Turkey", "Istanbul Airport");
     public static Airline ANKARA_ESENBOGA = new Airline(6L, "Turkey", "Ankara Esenboga Airport");
+    public static Airline FRANCE_PARIS = new Airline(7L, "France", "Paris-charles De Gaulle");
 
     private Long id;
     private String country;

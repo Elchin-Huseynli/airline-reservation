@@ -1,7 +1,5 @@
-server:
-  port: 9094
 
 eureka:
   client:
-    register-with-eureka: true
-    fetch-registry: true
+    register-with-eureka: false
+    fetch-registry: false

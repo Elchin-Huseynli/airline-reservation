@@ -23,26 +23,21 @@ public class Airplane {
     @Column(name = "capacity",nullable = false)
     private Integer capacity;  // 500
 
-    @Column(name = "available_seats",nullable = false)
-    private Integer availableSeats;
-
     @Builder.Default
     @Column(name = "busy",nullable = false)
     private boolean busy = false;
 
-    @Builder.Default
     @Column(name = "status")
-    private boolean status = true;
+    private boolean status ;
 
 
 
 
-    public Airplane(Long id, String name, Float maxSpeed, Integer capacity, Integer availableSeats, boolean busy, boolean status) {
+    public Airplane(Long id, String name, Float maxSpeed, Integer capacity, boolean busy, boolean status) {
         this.id = id;
         this.name = name;
         this.maxSpeed = maxSpeed;
         this.capacity = capacity;
-        this.availableSeats = availableSeats;
         this.busy = busy;
         this.status = status;
     }
@@ -97,14 +92,6 @@ public class Airplane {
 
     public void setStatus(boolean status) {
         this.status = status;
-    }
-
-    public Integer getAvailableSeats() {
-        return availableSeats;
-    }
-
-    public void setAvailableSeats(Integer availableSeats) {
-        this.availableSeats = availableSeats;
     }
 
     public boolean isBusy() {

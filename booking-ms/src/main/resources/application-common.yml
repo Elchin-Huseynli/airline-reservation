@@ -1,0 +1,9 @@
+server:
+  port: 9094
+
+
+application:
+  common:
+    user-id: 1
+    buy-ticket: 1000
+    email: gmail.com
